@@ -1,0 +1,19 @@
+{
+  "name": "building-labeling-agent",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "axios": "^1.16.1",
+    "canvas": "^3.2.3",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "minecraft-protocol": "^1.66.2",
+    "mineflayer": "^4.25.0",
+    "prismarine-chat": "^1.13.0",
+    "prismarine-viewer": "^1.33.0",
+    "puppeteer": "^24.43.1"
+  }
+}
