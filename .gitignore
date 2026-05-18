@@ -1,6 +1,7 @@
 node_modules/
 .env
 screenshots/*.png
+screenshots/*.jpg
 bot.log
 tests/bot.log
 package-lock.json

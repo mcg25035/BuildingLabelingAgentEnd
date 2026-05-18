@@ -28,7 +28,7 @@ async function takeScreenshot(viewerPort) {
             env: { ...process.env, DISPLAY: '' }
         })
         const page = await browser.newPage()
-        await page.setViewport({ width: 1920, height: 1080 })
+        await page.setViewport({ width: 1280, height: 720 })
         await page.goto(`http://localhost:${viewerPort}`, { waitUntil: 'domcontentloaded', timeout: 60000 })
         
         await sleep(2000)
@@ -40,10 +40,11 @@ async function takeScreenshot(viewerPort) {
         }
         await sleep(500)
 
-        const screenshotName = `screenshot-${Date.now()}.png`
+        const screenshotName = `screenshot-${Date.now()}.jpg`
         const screenshotPath = path.join(SCREENSHOT_DIR, screenshotName)
         
-        await page.screenshot({ path: screenshotPath })
+        // Use JPEG with 60% quality to drastically reduce base64 size (prevents API 403 payload limits)
+        await page.screenshot({ path: screenshotPath, type: 'jpeg', quality: 60 })
         Logger.info(`Screenshot saved: ${screenshotName}`)
         return { name: screenshotName, path: screenshotPath }
     } finally {
