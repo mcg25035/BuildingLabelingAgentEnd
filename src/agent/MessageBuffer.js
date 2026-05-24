@@ -24,15 +24,23 @@ class MessageBuffer {
             }
         }
 
-        // Prune intermediate images: keep the first (index 0) and the previous (last in the array currently)
-        if (imageMsgIndices.length > 2) {
-            for (let i = 1; i < imageMsgIndices.length - 1; i++) {
-                const idx = imageMsgIndices[i];
-                const msg = this.messages[idx];
-                msg.content = msg.content.filter(item => item.type !== 'image_url');
-                // Only add placeholder if it's not already there to prevent duplication
-                if (!msg.content.some(item => item.text && item.text.includes('歷史截圖已移除'))) {
-                    msg.content.push({ type: 'text', text: '[系統提示：此處原有的歷史截圖已移除以節省傳輸空間]' });
+        // Keep the first image (index 0) and the last two images (last two indices)
+        // Everything else in between gets its image removed.
+        if (imageMsgIndices.length > 3) {
+            const keepIndices = new Set([
+                imageMsgIndices[0], 
+                imageMsgIndices[imageMsgIndices.length - 2], 
+                imageMsgIndices[imageMsgIndices.length - 1]
+            ]);
+
+            for (const idx of imageMsgIndices) {
+                if (!keepIndices.has(idx)) {
+                    const msg = this.messages[idx];
+                    msg.content = msg.content.filter(item => item.type !== 'image_url');
+                    // Only add placeholder if it's not already there
+                    if (!msg.content.some(item => item.text && item.text.includes('歷史截圖已移除'))) {
+                        msg.content.push({ type: 'text', text: '[系統提示：此處原有的歷史截圖已移除以節省傳輸空間]' });
+                    }
                 }
             }
         }

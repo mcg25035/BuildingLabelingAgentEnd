@@ -49,8 +49,9 @@ class BotManager {
             }, 3000)
             
             if (!this.viewerStarted) {
-                mineflayerViewer(this.bot, { port: this.viewerPort, firstPerson: true })
-                Logger.info(`Viewer started on port ${this.viewerPort}`)
+                // Set viewDistance to 32 to ensure everything is visible from very high altitude
+                mineflayerViewer(this.bot, { port: this.viewerPort, firstPerson: true, viewDistance: 32 })
+                Logger.info(`Viewer started on port ${this.viewerPort} (viewDistance: 32)`)
                 this.viewerStarted = true
             }
         })
@@ -77,7 +78,8 @@ class BotManager {
 
     async prepareResetPosition() {
         Logger.info('Preparing reset position...')
-        this.bot.chat('/minecraft:tp @s ~ 340 ~')
+        // Set height to 340 as requested by user
+        this.bot.chat('/minecraft:tp @s ~ 340 ~ 0 90')
         this.bot.chat('/gamemode creative')
         await sleep(1000)
         

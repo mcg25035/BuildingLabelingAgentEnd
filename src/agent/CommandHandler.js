@@ -80,6 +80,19 @@ class CommandHandler {
                 currentPrompt = `.tp 執行完成。`;
             }
             screenshot = await takeScreenshot(this.botManager.viewerPort);
+        } else if (commandLine.startsWith('.high-view ')) {
+            const parts = commandLine.split(' ').filter(p => p.length > 0);
+            const height = parseFloat(parts[1]);
+            if (isNaN(height)) {
+                currentPrompt = `指令格式錯誤 (${commandLine})。參數必需為數字。`;
+            } else {
+                Logger.info(`Executing high-view: height ${height}`);
+                await this.botManager.prepareResetPosition();
+                this.botManager.bot.chat(`/minecraft:tp @s ~ ~${height} ~ 0 90`);
+                await sleep(1000);
+                currentPrompt = `.high-view 執行完成。`;
+            }
+            screenshot = await takeScreenshot(this.botManager.viewerPort);
         } else if (commandLine.startsWith('.confirm ')) {
             const pt = commandLine.split(' ')[1];
             Logger.info(`Agent confirmed point ${pt}`);

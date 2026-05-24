@@ -41,7 +41,7 @@ class LlmAgent {
                 ];
 
                 this.messageBuffer.addMessage('user', userContent);
-                
+
                 const replyText = await this.provider.chat(this.messageBuffer.getMessages());
                 Logger.info(`\n🤖 LLM Reply:\n${replyText}\n`);
                 this.messageBuffer.addMessage('assistant', replyText);
@@ -65,13 +65,25 @@ class LlmAgent {
                 screenshot = result.screenshot;
 
             } catch (err) {
-                Logger.error(`LLM Agent loop error: ${err.message}`);
-                await sleep(5000);
-                // Safe fallback screenshot
-                try { screenshot = await takeScreenshot(this.botManager.viewerPort) } catch(e) {}
-                currentPrompt = `系統提示：發生錯誤 (${err.message})，請重試或重新發送指令。`;
+                const isRateLimit = err.response && (err.response.status === 429 || err.response.status === 402);
+                Logger.error(`LLM Agent loop error: ${err.message}${isRateLimit ? ' (Rate Limit/Balance)' : ''}`);
+
+                if (isRateLimit) {
+                    // Remove the failed user message from buffer to prevent duplication on retry
+                    if (this.messageBuffer.messages.length > 0 && this.messageBuffer.messages[this.messageBuffer.messages.length - 1].role === 'user') {
+                        this.messageBuffer.messages.pop();
+                    }
+                    Logger.info('Waiting 30s before retrying due to rate limit...');
+                    await sleep(30000);
+                    // Do NOT retake screenshot, reuse the current one
+                } else {
+                    await sleep(5000);
+                    try { screenshot = await takeScreenshot(this.botManager.viewerPort) } catch(e) {}
+                    currentPrompt = `系統提示：發生錯誤 (${err.message})，請重試或重新發送指令。`;
+                }
             }
         }
+
     }
 }
 
